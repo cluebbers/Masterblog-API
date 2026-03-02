@@ -15,6 +15,11 @@ def get_posts():
     
     sort = request.args.get("sort")
     direction = request.args.get("direction", "asc")
+    
+    if sort is not None and sort not in ["title", "content"]:
+        return jsonify({"Error": "Invalid sort. Use 'title' or 'content'."}), 400
+    if direction not in ["asc", "desc"]:
+        return jsonify({"Error": "Invalid direction. Use 'asc' or 'desc'."}), 400
     if direction == "asc":
         direction = False
     elif direction == "desc":
