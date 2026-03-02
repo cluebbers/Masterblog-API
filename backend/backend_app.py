@@ -28,7 +28,7 @@ def add_post():
         return jsonify({"Error": "Content required."}), 400
     new_post["id"] = len(POSTS) + 1
     POSTS.append(new_post)
-    return jsonify(POSTS), 201    
+    return jsonify(new_post), 201    
     
 @app.route("/api/posts/<int:id>", methods=["DELETE"])
 def delete_post(id):
@@ -38,6 +38,19 @@ def delete_post(id):
             return jsonify({"message": f"Post with id {id} has been deleted successfully."}), 200
     return jsonify({"Error": "Post ID not found"}), 404
     
+
+@app.route("/api/posts/<int:id>", methods=["PUT"])
+def update_post(id):
+    new_post = request.get_json()
+    for post in POSTS:
+        if post["id"] == id:
+            if "title" in new_post:
+                post["title"]= new_post["title"]
+            if "content" in new_post:
+                post["content"] = new_post["content"]
+            return jsonify(post), 200
+    return jsonify({"Error": "Post ID not found"}), 404
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5002, debug=True)
