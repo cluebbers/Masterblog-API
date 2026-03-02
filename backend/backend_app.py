@@ -28,16 +28,22 @@ def add_post():
         return jsonify({"Error": "Content required."}), 400
     new_post["id"] = len(POSTS) + 1
     POSTS.append(new_post)
-    return jsonify(new_post), 201    
-    
+    return jsonify(new_post), 201
+
+
 @app.route("/api/posts/<int:id>", methods=["DELETE"])
 def delete_post(id):
     for post in POSTS:
         if post["id"] == id:
             POSTS.remove(post)
-            return jsonify({"message": f"Post with id {id} has been deleted successfully."}), 200
+            return (
+                jsonify(
+                    {"message": f"Post with id {id} has been deleted successfully."}
+                ),
+                200,
+            )
     return jsonify({"Error": "Post ID not found"}), 404
-    
+
 
 @app.route("/api/posts/<int:id>", methods=["PUT"])
 def update_post(id):
@@ -45,11 +51,28 @@ def update_post(id):
     for post in POSTS:
         if post["id"] == id:
             if "title" in new_post:
-                post["title"]= new_post["title"]
+                post["title"] = new_post["title"]
             if "content" in new_post:
                 post["content"] = new_post["content"]
             return jsonify(post), 200
     return jsonify({"Error": "Post ID not found"}), 404
+
+
+@app.route("/api/posts/search", methods=["GET"])
+def search_post():
+    title_search = request.args.get("title", "").strip().lower()
+    content_search = request.args.get("content", "").strip().lower()
+
+    found_posts = []
+    for post in POSTS:
+        title_post = post.get("title", "").lower()
+        content_post = post.get("content", "").lower()
+
+        title_match = title_search in title_post or not title_search
+        content_match = content_search in content_post or not content_search
+        if title_match and content_match:
+            found_posts.append(post)
+    return jsonify(found_posts), 200
 
 
 if __name__ == "__main__":
